@@ -1,12 +1,14 @@
 # Knowledge Ssm
 
-This is the SSM adapter for knowledge gem.
+This is the official AWS SSM adapter for knowledge gem.
 
 ## Disclaimer
 
-The full documentation is currently being written. You should be able to find a better documentation in a few hours.
+The full documentation is currently being written. You should be able to find a better documentation in a few hours or days.
 
 Waiting for the full documentation, you can have a look at the code which is already well-documented.
+
+Have a look to the [wiki](https://github.com/knowledge-ruby/knowledge-ssm/wiki) too.
 
 ## Installation
 
