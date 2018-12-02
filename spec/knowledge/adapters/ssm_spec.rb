@@ -118,10 +118,6 @@ RSpec.describe Knowledge::Adapters::Ssm do
     end
   end
 
-  describe '#client' do
-    it { expect(subject.send(:client)).to be_a Aws::SSM::Client }
-  end
-
   describe '#fetch_parameters' do
     let(:param_name) { '/path/to/variable' }
     let(:var_name) { :var_name }
@@ -135,7 +131,10 @@ RSpec.describe Knowledge::Adapters::Ssm do
   end
 
   describe '#fetch_recursive_parameters' do
+    let(:client) { double }
     let(:result) { double }
+
+    before { expect(subject).to receive(:client).and_return(client).at_least(:once) }
 
     context 'working case' do
       before do
@@ -172,7 +171,10 @@ RSpec.describe Knowledge::Adapters::Ssm do
   end
 
   describe '#fetch_parameter' do
+    let(:client) { double }
     let(:path) { '/path/to/var' }
+
+    before { expect(subject).to receive(:client).and_return(client).at_least(:once) }
 
     context 'working case' do
       let(:result) { double }
