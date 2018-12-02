@@ -21,6 +21,26 @@ RSpec.describe Knowledge::Adapters::Ssm do
   end
 
   describe '#initialize' do
+    context 'with client in params' do
+      let(:client) { double }
+
+      context 'string key' do
+        let(:params) { { 'client' => client } }
+
+        it 'sets the client' do
+          expect(subject.send(:client)).to eq client
+        end
+      end
+
+      context 'sym key' do
+        let(:params) { { client: client } }
+
+        it 'sets the client' do
+          expect(subject.send(:client)).to eq client
+        end
+      end
+    end
+
     context 'with root_path in params' do
       let(:root_path) { '/root/path' }
 

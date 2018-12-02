@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'aws-sdk-ssm'
-require 'pry'
 
 module Knowledge
   module Adapters
@@ -31,15 +30,19 @@ module Knowledge
 
       # == Constructor =================================================================================================
       #
-      # @option [Hash] :params
-      # @option [Hash] :variables
-      # @option [Class] :setter
+      # @param [Hash] :params
+      # @option params [Aws::SSM::Client] :client
+      # @option params [Boolean] :raise_on_parameter_not_found
+      # @option params [String] :root_path
+      # @param [Hash] :variables
+      # @param [Class] :setter
       #
       def initialize(params: {}, setter:, variables:)
         super
 
-        @root_path = params[:root_path] || params['root_path']
+        @client = params[:client] || params['client']
         @raise_not_found = params[:raise_on_parameter_not_found] || params['raise_on_parameter_not_found'] || false
+        @root_path = params[:root_path] || params['root_path']
         @ssm_parameters = @root_path ? fetch_recursive_parameters : fetch_parameters
       end
 
@@ -98,6 +101,10 @@ module Knowledge
       #
       # Recursively fetches parameters on SSM according to the given path
       #
+      # === Errors ===
+      #
+      # @raise [Knowledge::SsmError]
+      #
       # === Parameters ===
       #
       # @return [Array<Aws::SSM::Types::Parameter>]
@@ -129,9 +136,13 @@ module Knowledge
       #
       # Fetches a parameter by its path on SSM
       #
+      # === Error ===
+      #
+      # @raise [Knowledge::SsmError]
+      #
       # === Parameters ===
       #
-      # @option [String] :path
+      # @param [String] :path
       #
       # @return [Aws::SSM::Types::Parameter]
       #
