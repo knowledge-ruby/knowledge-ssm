@@ -72,7 +72,7 @@ module Knowledge
       #
       # === Errors ===
       #
-      # @raise [Aws::SSM::Errors::UnrecognozedClientException]
+      # @raise [Aws::SSM::Errors::UnrecognizedClientException]
       # @raise [Aws::SSM::AccessDeniedException]
       #
       # === Parameters ===
@@ -127,7 +127,7 @@ module Knowledge
         end
 
         parameters
-      rescue ::Aws::SSM::Errors::AccessDeniedException, ::Aws::SSM::Errors::UnrecognozedClientException => e
+      rescue ::Aws::SSM::Errors::AccessDeniedException, ::Aws::SSM::Errors::UnrecognizedClientException => e
         raise ::Knowledge::SsmError, "[#{e.class}]: #{e.message}"
       end
 
@@ -148,7 +148,7 @@ module Knowledge
       #
       def fetch_parameter(path:)
         client.get_parameter(name: path, with_decryption: true).parameter
-      rescue ::Aws::SSM::Errors::AccessDeniedException, ::Aws::SSM::Errors::UnrecognozedClientException => e
+      rescue ::Aws::SSM::Errors::AccessDeniedException, ::Aws::SSM::Errors::UnrecognizedClientException => e
         raise ::Knowledge::SsmError, "[#{e.class}]: #{e.message}"
       rescue ::Aws::SSM::Errors::ParameterNotFound => e
         raise ::Knowledge::SsmError, "[#{e.class}]: #{e.message}" if raise_not_found

@@ -160,10 +160,10 @@ RSpec.describe Knowledge::Adapters::Ssm do
       end
     end
 
-    context 'on Aws::SSM::Errors::UnrecognozedClientException' do
+    context 'on Aws::SSM::Errors::UnrecognizedClientException' do
       it 'relies on client#get_parameters_by_path' do
         expect(subject.send(:client)).to receive(:get_parameters_by_path).and_raise(
-          Aws::SSM::Errors::UnrecognozedClientException.new('', '')
+          Aws::SSM::Errors::UnrecognizedClientException.new('', '')
         )
 
         expect { subject.send(:fetch_recursive_parameters) }.to raise_error Knowledge::SsmError
@@ -195,10 +195,10 @@ RSpec.describe Knowledge::Adapters::Ssm do
       end
     end
 
-    context 'on Aws::SSM::Errors::UnrecognozedClientException' do
+    context 'on Aws::SSM::Errors::UnrecognizedClientException' do
       it 'raises a Knowledge::SsmError' do
         expect(subject.send(:client)).to receive(:get_parameter).and_raise(
-          Aws::SSM::Errors::UnrecognozedClientException.new('', '')
+          Aws::SSM::Errors::UnrecognizedClientException.new('', '')
         )
 
         expect { subject.send(:fetch_parameter, path: path) }.to raise_error Knowledge::SsmError
