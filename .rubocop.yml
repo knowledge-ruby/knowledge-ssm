@@ -1,0 +1,10 @@
+Metrics/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 50
+
+Metrics/BlockLength:
+  Exclude:
+    - knowledge-ssm.gemspec
+    - spec/**/*.rb
