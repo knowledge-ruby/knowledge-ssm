@@ -26,6 +26,37 @@ Or install it yourself as:
 
     $ gem install knowledge-ssm
 
+## Dependencies - Aws SDK
+
+As AWS SDK version 2 and 3 have the same API, it has been dropped from the gem to allow developers using the version they want.
+
+**Using version 2:**
+
+[AWS official documentation for SDK v2](https://docs.aws.amazon.com/sdkforruby/api/index.html)
+
+```ruby
+# Add the SDK to your Gemfile
+gem 'aws-sdk', '~> 2.0'
+
+# And then Knowledge SSM adapter
+gem 'knowledge-ssm'
+```
+
+**Using version 3:**
+
+[AWS official documentation for SDK v3](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/)
+
+```ruby
+# You can add all the SDK
+gem 'aws-sdk', '~> 3'
+
+# Or just the service you need
+gem 'aws-sdk-ssm', '~> 1'
+
+# And then Knowledge SSM adapter
+gem 'knowledge-ssm'
+```
+
 ## Usage
 
 ```ruby

@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-require 'aws-sdk-ssm'
+begin
+  require 'aws-sdk'
+rescue ::LoadError => _e
+  require 'aws-sdk-ssm'
+end
 
 module Knowledge
   module Adapters
