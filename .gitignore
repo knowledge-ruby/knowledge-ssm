@@ -12,3 +12,4 @@
 
 /.ruby-*
 /knowledge-ssm-*.gem
+/Gemfile.lock
