@@ -116,6 +116,61 @@ RSpec.describe Knowledge::Adapters::Ssm do
         subject.run
       end
     end
+
+    context 'with default values' do
+      let(:param_name) { '/path/to/variable' }
+      let(:var_name) { :var_name }
+      let(:value) { :foo }
+      let(:variables) { { var_name.to_sym => [param_name, value] } }
+      let(:parameters) { [OpenStruct.new(name: param_name, value: nil)] }
+
+      it 'sets the variables' do
+        expect(setter).to receive(:set).with(name: var_name, value: value)
+
+        subject.run
+      end
+    end
+  end
+
+  describe '#extract_value' do
+    context 'no default value given' do
+      it 'returns original value' do
+        expect(subject.send(:extract_value, :foo, nil)).to eq :foo
+      end
+    end
+
+    context 'boolean value given' do
+      it 'returns original value' do
+        expect(subject.send(:extract_value, true, false)).to be true
+      end
+    end
+
+    context 'number value given' do
+      it 'returns original value' do
+        expect(subject.send(:extract_value, 1, :foo)).to eq 1
+        expect(subject.send(:extract_value, 1.0, :foo)).to eq 1.0
+      end
+    end
+
+    context 'nil value given' do
+      it 'returns default value' do
+        expect(subject.send(:extract_value, nil, :foo)).to eq :foo
+      end
+    end
+
+    context 'empty value given' do
+      it 'returns default value' do
+        expect(subject.send(:extract_value, '', :foo)).to eq :foo
+        expect(subject.send(:extract_value, [], :foo)).to eq :foo
+        expect(subject.send(:extract_value, {}, :foo)).to eq :foo
+      end
+    end
+
+    context 'string value given' do
+      it 'returns initial value' do
+        expect(subject.send(:extract_value, 'bar', :foo)).to eq 'bar'
+      end
+    end
   end
 
   describe '#fetch_parameters' do

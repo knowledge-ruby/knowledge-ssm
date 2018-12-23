@@ -9,18 +9,18 @@ end
 module Knowledge
   module Adapters
     #
-    # === Description ===
+    # === Description
     #
     # This adapter takes some vars in your SSM parameters and set it in your project's config.
     #
-    # === Usage ===
+    # === Usage
     #
     # @example:
     #   adapter = Knowledge::Adapters::Ssm.new(params: { root_path: '/path', setter: MySetter, variables: my_vars)
     #
     #   adapter.run
     #
-    # === Attributes ===
+    # === Attributes
     #
     # @attr_reader [Boolean] raise_not_found
     # @attr_reader [String] root_path
@@ -30,9 +30,18 @@ module Knowledge
     #
     class Ssm < Base
       # == Attributes ==================================================================================================
-      attr_reader :raise_not_found, :root_path, :ssm_parameters
+      
+      # Defines whether we should raise an error on param not found or not
+      attr_reader :raise_not_found
+
+      # Root path for SSM parameters
+      attr_reader :root_path
+
+      # Parameters to fetch
+      attr_reader :ssm_parameters
 
       # == Constructor =================================================================================================
+      
       #
       # @param [Hash] :params
       # @option params [Aws::SSM::Client] :client
@@ -51,35 +60,32 @@ module Knowledge
       end
 
       # == Instance Methods ============================================================================================
-      #
-      # === Description ===
+
       #
       # Runs the actual adapter.
       #
       def run
-        variables.each do |name, path|
+        variables.each do |name, (path, default_value)|
           base_path = root_path[0..-2] if root_path&.end_with?('/')
           path = "/#{path.sub('/', '')}"
           value = Array(@ssm_parameters).detect { |p| p.name == "#{base_path}#{path}" }&.value
 
-          setter.set(name: name, value: value)
+          setter.set(name: name, value: extract_value(value, default_value))
         end
       end
 
       protected
 
       #
-      # === Description ===
-      #
       # Credentials for AWS should be loaded from the ENV vars by the client itself.
       # Authorization is done automatically according to the current AWS policies.
       #
-      # === Errors ===
+      # === Errors
       #
       # @raise [Aws::SSM::Errors::UnrecognizedClientException]
       # @raise [Aws::SSM::AccessDeniedException]
       #
-      # === Parameters ===
+      # === Parameters
       #
       # @return [Aws::SSM::Client]
       #
@@ -88,11 +94,35 @@ module Knowledge
       end
 
       #
-      # === Description ===
+      # Fallbacks to the default value if the value is empty
+      #
+      # === Parameters
+      #
+      # @attr [Any] initial_value
+      # @attr [Any] default_value
+      #
+      # @return [Any] the value or the default
+      #
+      def extract_value(initial_value, default_value = nil)
+        # If no default value given
+        return initial_value if default_value.nil?
+
+        # If boolean value
+        return initial_value if initial_value == !!initial_value
+
+        # If number
+        return initial_value if initial_value.respond_to?(:to_f) && initial_value.to_f == initial_value
+        
+        # If initial value nil or empty
+        return default_value if initial_value.nil? || (initial_value.respond_to?(:empty?) && initial_value.empty?)
+
+        initial_value
+      end
+
       #
       # Fetches parameters one by one on SSM according to their specific path
       #
-      # === Parameters ===
+      # === Parameters
       #
       # @return [Array<Aws::SSM::Types::Parameter>]
       #
@@ -101,15 +131,13 @@ module Knowledge
       end
 
       #
-      # === Description ===
-      #
       # Recursively fetches parameters on SSM according to the given path
       #
-      # === Errors ===
+      # === Errors
       #
       # @raise [Knowledge::SsmError]
       #
-      # === Parameters ===
+      # === Parameters
       #
       # @return [Array<Aws::SSM::Types::Parameter>]
       #
@@ -136,15 +164,13 @@ module Knowledge
       end
 
       #
-      # === Description ===
-      #
       # Fetches a parameter by its path on SSM
       #
-      # === Error ===
+      # === Error
       #
       # @raise [Knowledge::SsmError]
       #
-      # === Parameters ===
+      # === Parameters
       #
       # @param [String] :path
       #

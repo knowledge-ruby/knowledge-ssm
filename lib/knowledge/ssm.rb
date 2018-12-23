@@ -6,11 +6,11 @@ module Knowledge
   class SsmError < Error; end
 
   #
-  # === Description ===
+  # === Description
   #
   # SSM Adapter for Knowledge gem
   #
-  # === Usage ===
+  # === Usage
   #
   # @example:
   #   require 'knowledge/ssm'
