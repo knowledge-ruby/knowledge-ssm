@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe Knowledge::Adapters::Ssm do
   let(:parameters) { [] }
   let(:params) { {} }
-  let(:setter) { Knowledge::Setter.new }
+  let(:setter) { Knowledge::Setters::Base.new }
   let(:variables) { {} }
 
   subject do
@@ -129,6 +129,76 @@ RSpec.describe Knowledge::Adapters::Ssm do
 
         subject.run
       end
+    end
+  end
+
+  describe '#blank?' do
+    context 'nil value given' do
+      it { expect(subject.send(:blank?, nil)).to be true }
+    end
+
+    context 'empty string given' do
+      it { expect(subject.send(:blank?, '')).to be true }
+    end
+
+    context 'empty array given' do
+      it { expect(subject.send(:blank?, [])).to be true }
+    end
+
+    context 'empty object given' do
+      it { expect(subject.send(:blank?, {})).to be true }
+    end
+
+    context 'boolean given' do
+      it { expect(subject.send(:blank?, true)).to be false }
+      it { expect(subject.send(:blank?, false)).to be false }
+    end
+
+    context 'string given' do
+      it { expect(subject.send(:blank?, 'foo')).to be false }
+    end
+
+    context 'array given' do
+      it { expect(subject.send(:blank?, ['foo'])).to be false }
+    end
+
+    context 'hash given' do
+      it { expect(subject.send(:blank?, foo: :bar)).to be false }
+    end
+  end
+
+  describe '#boolean?' do
+    context 'nil value given' do
+      it { expect(subject.send(:boolean?, nil)).to be false }
+    end
+
+    context 'empty string given' do
+      it { expect(subject.send(:boolean?, '')).to be false }
+    end
+
+    context 'empty array given' do
+      it { expect(subject.send(:boolean?, [])).to be false }
+    end
+
+    context 'empty object given' do
+      it { expect(subject.send(:boolean?, {})).to be false }
+    end
+
+    context 'string given' do
+      it { expect(subject.send(:boolean?, 'foo')).to be false }
+    end
+
+    context 'array given' do
+      it { expect(subject.send(:boolean?, ['foo'])).to be false }
+    end
+
+    context 'hash given' do
+      it { expect(subject.send(:blank?, foo: :bar)).to be false }
+    end
+
+    context 'boolean given' do
+      it { expect(subject.send(:boolean?, true)).to be true }
+      it { expect(subject.send(:boolean?, false)).to be true }
     end
   end
 

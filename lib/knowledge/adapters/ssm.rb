@@ -30,7 +30,7 @@ module Knowledge
     #
     class Ssm < Base
       # == Attributes ==================================================================================================
-      
+
       # Defines whether we should raise an error on param not found or not
       attr_reader :raise_not_found
 
@@ -41,7 +41,7 @@ module Knowledge
       attr_reader :ssm_parameters
 
       # == Constructor =================================================================================================
-      
+
       #
       # @param [Hash] :params
       # @option params [Aws::SSM::Client] :client
@@ -66,7 +66,6 @@ module Knowledge
       #
       def run
         variables.each do |name, (path, default_value)|
-          base_path = root_path[0..-2] if root_path&.end_with?('/')
           path = "/#{path.sub('/', '')}"
           value = Array(@ssm_parameters).detect { |p| p.name == "#{base_path}#{path}" }&.value
 
@@ -75,6 +74,43 @@ module Knowledge
       end
 
       protected
+
+      #
+      # Memoized, well formatted base path
+      #
+      # === Parameters
+      #
+      # @return [String]
+      #
+      def base_path
+        @base_path ||= root_path[0..-2] if root_path&.end_with?('/')
+      end
+
+      #
+      # Checks if a value is nil or empty
+      #
+      # === Parameters
+      #
+      # @param [Any] value
+      #
+      # @return [Boolean]
+      #
+      def blank?(value)
+        value.nil? || (value.respond_to?(:empty?) && value.empty?)
+      end
+
+      #
+      # Checks if a value is a boolean value
+      #
+      # === Parameters
+      #
+      # @param [Any] value
+      #
+      # @return [Boolean]
+      #
+      def boolean?(value)
+        value == !!value # rubocop:disable Style/DoubleNegation
+      end
 
       #
       # Credentials for AWS should be loaded from the ENV vars by the client itself.
@@ -108,13 +144,13 @@ module Knowledge
         return initial_value if default_value.nil?
 
         # If boolean value
-        return initial_value if initial_value == !!initial_value
+        return initial_value if boolean?(initial_value)
 
         # If number
-        return initial_value if initial_value.respond_to?(:to_f) && initial_value.to_f == initial_value
-        
+        return initial_value if initial_value.is_a?(Numeric)
+
         # If initial value nil or empty
-        return default_value if initial_value.nil? || (initial_value.respond_to?(:empty?) && initial_value.empty?)
+        return default_value if blank?(initial_value)
 
         initial_value
       end
